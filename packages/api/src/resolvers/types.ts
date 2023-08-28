@@ -15,6 +15,7 @@ import HighlightModel from '../datalayer/highlight'
 import ReactionModel from '../datalayer/reaction'
 import { PubsubClient } from '../datalayer/pubsub'
 import ReminderModel from '../datalayer/reminders'
+import SavedSearchModel from '../datalayer/saved_search'
 
 export interface Claims {
   uid: string
@@ -40,6 +41,7 @@ export type DataModels = {
   highlight: HighlightModel
   reaction: ReactionModel
   reminder: ReminderModel
+  savedSearch: SavedSearchModel
 }
 
 export interface RequestContext {

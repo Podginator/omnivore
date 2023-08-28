@@ -37,6 +37,7 @@ export type HeaderDropdownAction =
   | 'navigate-to-subscriptions'
   | 'navigate-to-api'
   | 'navigate-to-integrations'
+  | 'navigate-to-saved-searches'
   | 'increaseFontSize'
   | 'decreaseFontSize'
   | 'logout'
@@ -66,6 +67,9 @@ export function PrimaryDropdown(props: PrimaryDropdownProps): JSX.Element {
         case 'navigate-to-integrations':
           router.push('/settings/integrations')
           break
+        case 'navigate-to-saved-searches':
+          router.push('/settings/saved-searches')
+          break;
         case 'logout':
           document.dispatchEvent(new Event('logout'))
           break

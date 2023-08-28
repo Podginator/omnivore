@@ -118,6 +118,9 @@ import {
   validateUsernameResolver,
   webhookResolver,
   webhooksResolver,
+  getSavedSearchResolver,
+  updateSavedSearchResolver,
+  deleteSavedSearchResolver,
 } from './index'
 import { createReactionResolver, deleteReactionResolver } from './reaction'
 import { markEmailAsItemResolver, recentEmailsResolver } from './recent_emails'
@@ -210,6 +213,8 @@ export const functionResolvers = {
     importFromIntegration: importFromIntegrationResolver,
     setFavoriteArticle: setFavoriteArticleResolver,
     updateSubscription: updateSubscriptionResolver,
+    updateSavedSearch: updateSavedSearchResolver,
+    deleteSavedSearch: deleteSavedSearchResolver,
   },
   Query: {
     me: getMeUserResolver,
@@ -242,6 +247,7 @@ export const functionResolvers = {
     filters: filtersResolver,
     groups: groupsResolver,
     recentEmails: recentEmailsResolver,
+    savedSearches: getSavedSearchResolver,
   },
   User: {
     async sharedArticles(

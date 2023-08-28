@@ -34,6 +34,23 @@ export type AddPopularReadSuccess = {
   pageId: Scalars['String'];
 };
 
+export type AddSavedSearchError = {
+  __typename?: 'AddSavedSearchError';
+  errorCodes: Array<AddSavedSearchErrorCode>;
+};
+
+export enum AddSavedSearchErrorCode {
+  Conflict = 'CONFLICT',
+  Unauthorized = 'UNAUTHORIZED'
+}
+
+export type AddSavedSearchResult = AddSavedSearchError | AddSavedSearchSuccess;
+
+export type AddSavedSearchSuccess = {
+  __typename?: 'AddSavedSearchSuccess';
+  savedSearch: SavedSearch;
+};
+
 export type ApiKey = {
   __typename?: 'ApiKey';
   createdAt: Scalars['Date'];
@@ -671,6 +688,23 @@ export type DeleteRuleSuccess = {
   rule: Rule;
 };
 
+export type DeleteSavedSearchError = {
+  __typename?: 'DeleteSavedSearchError';
+  errorCodes: Array<DeleteSavedSearchErrorCode>;
+};
+
+export enum DeleteSavedSearchErrorCode {
+  NotFound = 'NOT_FOUND',
+  Unauthorized = 'UNAUTHORIZED'
+}
+
+export type DeleteSavedSearchResult = DeleteSavedSearchError | DeleteSavedSearchSuccess;
+
+export type DeleteSavedSearchSuccess = {
+  __typename?: 'DeleteSavedSearchSuccess';
+  id: Scalars['String'];
+};
+
 export type DeleteWebhookError = {
   __typename?: 'DeleteWebhookError';
   errorCodes: Array<DeleteWebhookErrorCode>;
@@ -1252,6 +1286,7 @@ export type Mutation = {
   deleteReaction: DeleteReactionResult;
   deleteReminder: DeleteReminderResult;
   deleteRule: DeleteRuleResult;
+  deleteSavedSearch: DeleteSavedSearchResult;
   deleteWebhook: DeleteWebhookResult;
   generateApiKey: GenerateApiKeyResult;
   googleLogin: LoginResult;
@@ -1295,6 +1330,7 @@ export type Mutation = {
   updateLinkShareInfo: UpdateLinkShareInfoResult;
   updatePage: UpdatePageResult;
   updateReminder: UpdateReminderResult;
+  updateSavedSearch: UpdateSavedSearchResult;
   updateSharedComment: UpdateSharedCommentResult;
   updateSubscription: UpdateSubscriptionResult;
   updateUser: UpdateUserResult;
@@ -1405,6 +1441,11 @@ export type MutationDeleteReminderArgs = {
 
 export type MutationDeleteRuleArgs = {
   id: Scalars['ID'];
+};
+
+
+export type MutationDeleteSavedSearchArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -1619,6 +1660,11 @@ export type MutationUpdateReminderArgs = {
 };
 
 
+export type MutationUpdateSavedSearchArgs = {
+  input: UpdateSavedSearchInput;
+};
+
+
 export type MutationUpdateSharedCommentArgs = {
   input: UpdateSharedCommentInput;
 };
@@ -1797,6 +1843,7 @@ export type Query = {
   recentSearches: RecentSearchesResult;
   reminder: ReminderResult;
   rules: RulesResult;
+  savedSearches: SavedSearchesResult;
   search: SearchResult;
   sendInstallInstructions: SendInstallInstructionsResult;
   sharedArticle: SharedArticleResult;
@@ -2294,6 +2341,31 @@ export type SaveUrlInput = {
   state?: InputMaybe<ArticleSavingRequestStatus>;
   timezone?: InputMaybe<Scalars['String']>;
   url: Scalars['String'];
+};
+
+export type SavedSearch = {
+  __typename?: 'SavedSearch';
+  createdAt: Scalars['Date'];
+  id: Scalars['String'];
+  name: Scalars['String'];
+  position: Scalars['Int'];
+  query: Scalars['String'];
+};
+
+export type SavedSearchesError = {
+  __typename?: 'SavedSearchesError';
+  errorCodes: Array<SavedSearchesErrorCode>;
+};
+
+export enum SavedSearchesErrorCode {
+  Unauthorized = 'UNAUTHORIZED'
+}
+
+export type SavedSearchesResult = SavedSearchesError | SavedSearchesSuccess;
+
+export type SavedSearchesSuccess = {
+  __typename?: 'SavedSearchesSuccess';
+  savedSearch: Array<SavedSearch>;
 };
 
 export type SearchError = {
@@ -2999,6 +3071,30 @@ export type UpdateReminderSuccess = {
   reminder: Reminder;
 };
 
+export type UpdateSavedSearchError = {
+  __typename?: 'UpdateSavedSearchError';
+  errorCodes: Array<UpdateSavedSearchErrorCode>;
+};
+
+export enum UpdateSavedSearchErrorCode {
+  NotFound = 'NOT_FOUND',
+  Unauthorized = 'UNAUTHORIZED'
+}
+
+export type UpdateSavedSearchInput = {
+  id: Scalars['String'];
+  name: Scalars['String'];
+  position: Scalars['Int'];
+  query: Scalars['String'];
+};
+
+export type UpdateSavedSearchResult = UpdateSavedSearchError | UpdateSavedSearchSuccess;
+
+export type UpdateSavedSearchSuccess = {
+  __typename?: 'UpdateSavedSearchSuccess';
+  savedSearch: SavedSearch;
+};
+
 export type UpdateSharedCommentError = {
   __typename?: 'UpdateSharedCommentError';
   errorCodes: Array<UpdateSharedCommentErrorCode>;
@@ -3372,6 +3468,10 @@ export type ResolversTypes = {
   AddPopularReadErrorCode: AddPopularReadErrorCode;
   AddPopularReadResult: ResolversTypes['AddPopularReadError'] | ResolversTypes['AddPopularReadSuccess'];
   AddPopularReadSuccess: ResolverTypeWrapper<AddPopularReadSuccess>;
+  AddSavedSearchError: ResolverTypeWrapper<AddSavedSearchError>;
+  AddSavedSearchErrorCode: AddSavedSearchErrorCode;
+  AddSavedSearchResult: ResolversTypes['AddSavedSearchError'] | ResolversTypes['AddSavedSearchSuccess'];
+  AddSavedSearchSuccess: ResolverTypeWrapper<AddSavedSearchSuccess>;
   ApiKey: ResolverTypeWrapper<ApiKey>;
   ApiKeysError: ResolverTypeWrapper<ApiKeysError>;
   ApiKeysErrorCode: ApiKeysErrorCode;
@@ -3491,6 +3591,10 @@ export type ResolversTypes = {
   DeleteRuleErrorCode: DeleteRuleErrorCode;
   DeleteRuleResult: ResolversTypes['DeleteRuleError'] | ResolversTypes['DeleteRuleSuccess'];
   DeleteRuleSuccess: ResolverTypeWrapper<DeleteRuleSuccess>;
+  DeleteSavedSearchError: ResolverTypeWrapper<DeleteSavedSearchError>;
+  DeleteSavedSearchErrorCode: DeleteSavedSearchErrorCode;
+  DeleteSavedSearchResult: ResolversTypes['DeleteSavedSearchError'] | ResolversTypes['DeleteSavedSearchSuccess'];
+  DeleteSavedSearchSuccess: ResolverTypeWrapper<DeleteSavedSearchSuccess>;
   DeleteWebhookError: ResolverTypeWrapper<DeleteWebhookError>;
   DeleteWebhookErrorCode: DeleteWebhookErrorCode;
   DeleteWebhookResult: ResolversTypes['DeleteWebhookError'] | ResolversTypes['DeleteWebhookSuccess'];
@@ -3680,6 +3784,11 @@ export type ResolversTypes = {
   SaveResult: ResolversTypes['SaveError'] | ResolversTypes['SaveSuccess'];
   SaveSuccess: ResolverTypeWrapper<SaveSuccess>;
   SaveUrlInput: SaveUrlInput;
+  SavedSearch: ResolverTypeWrapper<SavedSearch>;
+  SavedSearchesError: ResolverTypeWrapper<SavedSearchesError>;
+  SavedSearchesErrorCode: SavedSearchesErrorCode;
+  SavedSearchesResult: ResolversTypes['SavedSearchesError'] | ResolversTypes['SavedSearchesSuccess'];
+  SavedSearchesSuccess: ResolverTypeWrapper<SavedSearchesSuccess>;
   SearchError: ResolverTypeWrapper<SearchError>;
   SearchErrorCode: SearchErrorCode;
   SearchItem: ResolverTypeWrapper<SearchItem>;
@@ -3808,6 +3917,11 @@ export type ResolversTypes = {
   UpdateReminderInput: UpdateReminderInput;
   UpdateReminderResult: ResolversTypes['UpdateReminderError'] | ResolversTypes['UpdateReminderSuccess'];
   UpdateReminderSuccess: ResolverTypeWrapper<UpdateReminderSuccess>;
+  UpdateSavedSearchError: ResolverTypeWrapper<UpdateSavedSearchError>;
+  UpdateSavedSearchErrorCode: UpdateSavedSearchErrorCode;
+  UpdateSavedSearchInput: UpdateSavedSearchInput;
+  UpdateSavedSearchResult: ResolversTypes['UpdateSavedSearchError'] | ResolversTypes['UpdateSavedSearchSuccess'];
+  UpdateSavedSearchSuccess: ResolverTypeWrapper<UpdateSavedSearchSuccess>;
   UpdateSharedCommentError: ResolverTypeWrapper<UpdateSharedCommentError>;
   UpdateSharedCommentErrorCode: UpdateSharedCommentErrorCode;
   UpdateSharedCommentInput: UpdateSharedCommentInput;
@@ -3870,6 +3984,9 @@ export type ResolversParentTypes = {
   AddPopularReadError: AddPopularReadError;
   AddPopularReadResult: ResolversParentTypes['AddPopularReadError'] | ResolversParentTypes['AddPopularReadSuccess'];
   AddPopularReadSuccess: AddPopularReadSuccess;
+  AddSavedSearchError: AddSavedSearchError;
+  AddSavedSearchResult: ResolversParentTypes['AddSavedSearchError'] | ResolversParentTypes['AddSavedSearchSuccess'];
+  AddSavedSearchSuccess: AddSavedSearchSuccess;
   ApiKey: ApiKey;
   ApiKeysError: ApiKeysError;
   ApiKeysResult: ResolversParentTypes['ApiKeysError'] | ResolversParentTypes['ApiKeysSuccess'];
@@ -3961,6 +4078,9 @@ export type ResolversParentTypes = {
   DeleteRuleError: DeleteRuleError;
   DeleteRuleResult: ResolversParentTypes['DeleteRuleError'] | ResolversParentTypes['DeleteRuleSuccess'];
   DeleteRuleSuccess: DeleteRuleSuccess;
+  DeleteSavedSearchError: DeleteSavedSearchError;
+  DeleteSavedSearchResult: ResolversParentTypes['DeleteSavedSearchError'] | ResolversParentTypes['DeleteSavedSearchSuccess'];
+  DeleteSavedSearchSuccess: DeleteSavedSearchSuccess;
   DeleteWebhookError: DeleteWebhookError;
   DeleteWebhookResult: ResolversParentTypes['DeleteWebhookError'] | ResolversParentTypes['DeleteWebhookSuccess'];
   DeleteWebhookSuccess: DeleteWebhookSuccess;
@@ -4111,6 +4231,10 @@ export type ResolversParentTypes = {
   SaveResult: ResolversParentTypes['SaveError'] | ResolversParentTypes['SaveSuccess'];
   SaveSuccess: SaveSuccess;
   SaveUrlInput: SaveUrlInput;
+  SavedSearch: SavedSearch;
+  SavedSearchesError: SavedSearchesError;
+  SavedSearchesResult: ResolversParentTypes['SavedSearchesError'] | ResolversParentTypes['SavedSearchesSuccess'];
+  SavedSearchesSuccess: SavedSearchesSuccess;
   SearchError: SearchError;
   SearchItem: SearchItem;
   SearchItemEdge: SearchItemEdge;
@@ -4209,6 +4333,10 @@ export type ResolversParentTypes = {
   UpdateReminderInput: UpdateReminderInput;
   UpdateReminderResult: ResolversParentTypes['UpdateReminderError'] | ResolversParentTypes['UpdateReminderSuccess'];
   UpdateReminderSuccess: UpdateReminderSuccess;
+  UpdateSavedSearchError: UpdateSavedSearchError;
+  UpdateSavedSearchInput: UpdateSavedSearchInput;
+  UpdateSavedSearchResult: ResolversParentTypes['UpdateSavedSearchError'] | ResolversParentTypes['UpdateSavedSearchSuccess'];
+  UpdateSavedSearchSuccess: UpdateSavedSearchSuccess;
   UpdateSharedCommentError: UpdateSharedCommentError;
   UpdateSharedCommentInput: UpdateSharedCommentInput;
   UpdateSharedCommentResult: ResolversParentTypes['UpdateSharedCommentError'] | ResolversParentTypes['UpdateSharedCommentSuccess'];
@@ -4272,6 +4400,20 @@ export type AddPopularReadResultResolvers<ContextType = ResolverContext, ParentT
 
 export type AddPopularReadSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['AddPopularReadSuccess'] = ResolversParentTypes['AddPopularReadSuccess']> = {
   pageId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AddSavedSearchErrorResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['AddSavedSearchError'] = ResolversParentTypes['AddSavedSearchError']> = {
+  errorCodes?: Resolver<Array<ResolversTypes['AddSavedSearchErrorCode']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AddSavedSearchResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['AddSavedSearchResult'] = ResolversParentTypes['AddSavedSearchResult']> = {
+  __resolveType: TypeResolveFn<'AddSavedSearchError' | 'AddSavedSearchSuccess', ParentType, ContextType>;
+};
+
+export type AddSavedSearchSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['AddSavedSearchSuccess'] = ResolversParentTypes['AddSavedSearchSuccess']> = {
+  savedSearch?: Resolver<ResolversTypes['SavedSearch'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4706,6 +4848,20 @@ export type DeleteRuleResultResolvers<ContextType = ResolverContext, ParentType 
 
 export type DeleteRuleSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['DeleteRuleSuccess'] = ResolversParentTypes['DeleteRuleSuccess']> = {
   rule?: Resolver<ResolversTypes['Rule'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DeleteSavedSearchErrorResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['DeleteSavedSearchError'] = ResolversParentTypes['DeleteSavedSearchError']> = {
+  errorCodes?: Resolver<Array<ResolversTypes['DeleteSavedSearchErrorCode']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DeleteSavedSearchResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['DeleteSavedSearchResult'] = ResolversParentTypes['DeleteSavedSearchResult']> = {
+  __resolveType: TypeResolveFn<'DeleteSavedSearchError' | 'DeleteSavedSearchSuccess', ParentType, ContextType>;
+};
+
+export type DeleteSavedSearchSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['DeleteSavedSearchSuccess'] = ResolversParentTypes['DeleteSavedSearchSuccess']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5163,6 +5319,7 @@ export type MutationResolvers<ContextType = ResolverContext, ParentType extends 
   deleteReaction?: Resolver<ResolversTypes['DeleteReactionResult'], ParentType, ContextType, RequireFields<MutationDeleteReactionArgs, 'id'>>;
   deleteReminder?: Resolver<ResolversTypes['DeleteReminderResult'], ParentType, ContextType, RequireFields<MutationDeleteReminderArgs, 'id'>>;
   deleteRule?: Resolver<ResolversTypes['DeleteRuleResult'], ParentType, ContextType, RequireFields<MutationDeleteRuleArgs, 'id'>>;
+  deleteSavedSearch?: Resolver<ResolversTypes['DeleteSavedSearchResult'], ParentType, ContextType, RequireFields<MutationDeleteSavedSearchArgs, 'id'>>;
   deleteWebhook?: Resolver<ResolversTypes['DeleteWebhookResult'], ParentType, ContextType, RequireFields<MutationDeleteWebhookArgs, 'id'>>;
   generateApiKey?: Resolver<ResolversTypes['GenerateApiKeyResult'], ParentType, ContextType, RequireFields<MutationGenerateApiKeyArgs, 'input'>>;
   googleLogin?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationGoogleLoginArgs, 'input'>>;
@@ -5206,6 +5363,7 @@ export type MutationResolvers<ContextType = ResolverContext, ParentType extends 
   updateLinkShareInfo?: Resolver<ResolversTypes['UpdateLinkShareInfoResult'], ParentType, ContextType, RequireFields<MutationUpdateLinkShareInfoArgs, 'input'>>;
   updatePage?: Resolver<ResolversTypes['UpdatePageResult'], ParentType, ContextType, RequireFields<MutationUpdatePageArgs, 'input'>>;
   updateReminder?: Resolver<ResolversTypes['UpdateReminderResult'], ParentType, ContextType, RequireFields<MutationUpdateReminderArgs, 'input'>>;
+  updateSavedSearch?: Resolver<ResolversTypes['UpdateSavedSearchResult'], ParentType, ContextType, RequireFields<MutationUpdateSavedSearchArgs, 'input'>>;
   updateSharedComment?: Resolver<ResolversTypes['UpdateSharedCommentResult'], ParentType, ContextType, RequireFields<MutationUpdateSharedCommentArgs, 'input'>>;
   updateSubscription?: Resolver<ResolversTypes['UpdateSubscriptionResult'], ParentType, ContextType, RequireFields<MutationUpdateSubscriptionArgs, 'input'>>;
   updateUser?: Resolver<ResolversTypes['UpdateUserResult'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'input'>>;
@@ -5308,6 +5466,7 @@ export type QueryResolvers<ContextType = ResolverContext, ParentType extends Res
   recentSearches?: Resolver<ResolversTypes['RecentSearchesResult'], ParentType, ContextType>;
   reminder?: Resolver<ResolversTypes['ReminderResult'], ParentType, ContextType, RequireFields<QueryReminderArgs, 'linkId'>>;
   rules?: Resolver<ResolversTypes['RulesResult'], ParentType, ContextType, Partial<QueryRulesArgs>>;
+  savedSearches?: Resolver<ResolversTypes['SavedSearchesResult'], ParentType, ContextType>;
   search?: Resolver<ResolversTypes['SearchResult'], ParentType, ContextType, Partial<QuerySearchArgs>>;
   sendInstallInstructions?: Resolver<ResolversTypes['SendInstallInstructionsResult'], ParentType, ContextType>;
   sharedArticle?: Resolver<ResolversTypes['SharedArticleResult'], ParentType, ContextType, RequireFields<QuerySharedArticleArgs, 'slug' | 'username'>>;
@@ -5559,6 +5718,29 @@ export type SaveResultResolvers<ContextType = ResolverContext, ParentType extend
 export type SaveSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['SaveSuccess'] = ResolversParentTypes['SaveSuccess']> = {
   clientRequestId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SavedSearchResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['SavedSearch'] = ResolversParentTypes['SavedSearch']> = {
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  position?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  query?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SavedSearchesErrorResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['SavedSearchesError'] = ResolversParentTypes['SavedSearchesError']> = {
+  errorCodes?: Resolver<Array<ResolversTypes['SavedSearchesErrorCode']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SavedSearchesResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['SavedSearchesResult'] = ResolversParentTypes['SavedSearchesResult']> = {
+  __resolveType: TypeResolveFn<'SavedSearchesError' | 'SavedSearchesSuccess', ParentType, ContextType>;
+};
+
+export type SavedSearchesSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['SavedSearchesSuccess'] = ResolversParentTypes['SavedSearchesSuccess']> = {
+  savedSearch?: Resolver<Array<ResolversTypes['SavedSearch']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5991,6 +6173,20 @@ export type UpdateReminderSuccessResolvers<ContextType = ResolverContext, Parent
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type UpdateSavedSearchErrorResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['UpdateSavedSearchError'] = ResolversParentTypes['UpdateSavedSearchError']> = {
+  errorCodes?: Resolver<Array<ResolversTypes['UpdateSavedSearchErrorCode']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UpdateSavedSearchResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['UpdateSavedSearchResult'] = ResolversParentTypes['UpdateSavedSearchResult']> = {
+  __resolveType: TypeResolveFn<'UpdateSavedSearchError' | 'UpdateSavedSearchSuccess', ParentType, ContextType>;
+};
+
+export type UpdateSavedSearchSuccessResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['UpdateSavedSearchSuccess'] = ResolversParentTypes['UpdateSavedSearchSuccess']> = {
+  savedSearch?: Resolver<ResolversTypes['SavedSearch'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UpdateSharedCommentErrorResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['UpdateSharedCommentError'] = ResolversParentTypes['UpdateSharedCommentError']> = {
   errorCodes?: Resolver<Array<ResolversTypes['UpdateSharedCommentErrorCode']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -6198,6 +6394,9 @@ export type Resolvers<ContextType = ResolverContext> = {
   AddPopularReadError?: AddPopularReadErrorResolvers<ContextType>;
   AddPopularReadResult?: AddPopularReadResultResolvers<ContextType>;
   AddPopularReadSuccess?: AddPopularReadSuccessResolvers<ContextType>;
+  AddSavedSearchError?: AddSavedSearchErrorResolvers<ContextType>;
+  AddSavedSearchResult?: AddSavedSearchResultResolvers<ContextType>;
+  AddSavedSearchSuccess?: AddSavedSearchSuccessResolvers<ContextType>;
   ApiKey?: ApiKeyResolvers<ContextType>;
   ApiKeysError?: ApiKeysErrorResolvers<ContextType>;
   ApiKeysResult?: ApiKeysResultResolvers<ContextType>;
@@ -6278,6 +6477,9 @@ export type Resolvers<ContextType = ResolverContext> = {
   DeleteRuleError?: DeleteRuleErrorResolvers<ContextType>;
   DeleteRuleResult?: DeleteRuleResultResolvers<ContextType>;
   DeleteRuleSuccess?: DeleteRuleSuccessResolvers<ContextType>;
+  DeleteSavedSearchError?: DeleteSavedSearchErrorResolvers<ContextType>;
+  DeleteSavedSearchResult?: DeleteSavedSearchResultResolvers<ContextType>;
+  DeleteSavedSearchSuccess?: DeleteSavedSearchSuccessResolvers<ContextType>;
   DeleteWebhookError?: DeleteWebhookErrorResolvers<ContextType>;
   DeleteWebhookResult?: DeleteWebhookResultResolvers<ContextType>;
   DeleteWebhookSuccess?: DeleteWebhookSuccessResolvers<ContextType>;
@@ -6406,6 +6608,10 @@ export type Resolvers<ContextType = ResolverContext> = {
   SaveFilterSuccess?: SaveFilterSuccessResolvers<ContextType>;
   SaveResult?: SaveResultResolvers<ContextType>;
   SaveSuccess?: SaveSuccessResolvers<ContextType>;
+  SavedSearch?: SavedSearchResolvers<ContextType>;
+  SavedSearchesError?: SavedSearchesErrorResolvers<ContextType>;
+  SavedSearchesResult?: SavedSearchesResultResolvers<ContextType>;
+  SavedSearchesSuccess?: SavedSearchesSuccessResolvers<ContextType>;
   SearchError?: SearchErrorResolvers<ContextType>;
   SearchItem?: SearchItemResolvers<ContextType>;
   SearchItemEdge?: SearchItemEdgeResolvers<ContextType>;
@@ -6484,6 +6690,9 @@ export type Resolvers<ContextType = ResolverContext> = {
   UpdateReminderError?: UpdateReminderErrorResolvers<ContextType>;
   UpdateReminderResult?: UpdateReminderResultResolvers<ContextType>;
   UpdateReminderSuccess?: UpdateReminderSuccessResolvers<ContextType>;
+  UpdateSavedSearchError?: UpdateSavedSearchErrorResolvers<ContextType>;
+  UpdateSavedSearchResult?: UpdateSavedSearchResultResolvers<ContextType>;
+  UpdateSavedSearchSuccess?: UpdateSavedSearchSuccessResolvers<ContextType>;
   UpdateSharedCommentError?: UpdateSharedCommentErrorResolvers<ContextType>;
   UpdateSharedCommentResult?: UpdateSharedCommentResultResolvers<ContextType>;
   UpdateSharedCommentSuccess?: UpdateSharedCommentSuccessResolvers<ContextType>;

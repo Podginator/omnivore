@@ -964,6 +964,91 @@ const schema = gql`
     pageInfo: PageInfo!
   }
 
+  # Query: SavedSearches
+  union SavedSearchesResult = SavedSearchesSuccess | SavedSearchesError
+
+  enum SavedSearchesErrorCode {
+    UNAUTHORIZED
+  }
+
+  type SavedSearchesError {
+    errorCodes: [SavedSearchesErrorCode!]!
+  }
+
+  type SavedSearch {
+    id: String!
+    name: String!
+    query: String!
+    position: Int!
+    createdAt: Date!
+  }
+
+  type SavedSearchesSuccess {
+    savedSearch: [SavedSearch!]!
+  }
+
+  # Mutation: addSavedSearch
+
+  enum AddSavedSearchErrorCode {
+    UNAUTHORIZED
+    CONFLICT
+  }
+
+  type AddSavedSearchSuccess {
+    savedSearch: SavedSearch!
+  }
+
+  type AddSavedSearchError {
+    errorCodes: [AddSavedSearchErrorCode!]!
+  }
+
+  union AddSavedSearchResult = AddSavedSearchSuccess | AddSavedSearchError
+
+  # Mutation: updateSavedSearch
+
+  enum UpdateSavedSearchErrorCode {
+    UNAUTHORIZED
+    NOT_FOUND
+  }
+
+  type UpdateSavedSearchSuccess {
+    savedSearch: SavedSearch!
+  }
+
+  type UpdateSavedSearchError {
+    errorCodes: [UpdateSavedSearchErrorCode!]!
+  }
+
+  input UpdateSavedSearchInput {
+    id: String!
+    name: String!
+    query: String!
+    position: Int!
+  }
+
+  union UpdateSavedSearchResult =
+      UpdateSavedSearchSuccess
+    | UpdateSavedSearchError
+
+  # Mutation: deleteSavedSearch
+
+  enum DeleteSavedSearchErrorCode {
+    UNAUTHORIZED
+    NOT_FOUND
+  }
+
+  type DeleteSavedSearchSuccess {
+    id: String!
+  }
+
+  type DeleteSavedSearchError {
+    errorCodes: [DeleteSavedSearchErrorCode!]!
+  }
+
+  union DeleteSavedSearchResult =
+      DeleteSavedSearchSuccess
+    | DeleteSavedSearchError
+
   #  Mutation: setShareArticle
   enum SetShareArticleErrorCode {
     NOT_FOUND
@@ -2640,6 +2725,8 @@ const schema = gql`
     updateSubscription(
       input: UpdateSubscriptionInput!
     ): UpdateSubscriptionResult!
+    deleteSavedSearch(id: String!): DeleteSavedSearchResult!
+    updateSavedSearch(input: UpdateSavedSearchInput!): UpdateSavedSearchResult!
   }
 
   # FIXME: remove sort from feedArticles after all cached tabs are closed
@@ -2662,6 +2749,7 @@ const schema = gql`
       slug: String!
       selectedHighlightId: String
     ): SharedArticleResult!
+    savedSearches: SavedSearchesResult!
     feedArticles(
       after: String
       first: Int

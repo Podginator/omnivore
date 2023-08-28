@@ -15,6 +15,9 @@ services:
       retries: 3
     expose:
       - 5432
+    ports:
+      - "5432:5432"
+
 
   migrate:
     build:
@@ -38,6 +41,7 @@ services:
         condition: service_healthy
 
   elastic:
+    platform: "linux/arm64/v8"
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
     container_name: "omnivore-elastic"
     healthcheck:

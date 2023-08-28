@@ -11,7 +11,6 @@ export enum SetClaimsRole {
 export enum Table {
   USER = 'omnivore.user',
   LINKS = 'omnivore.links',
-
   PAGES = 'omnivore.pages',
   USER_PROFILE = 'omnivore.user_profile',
   USER_FRIEND = 'omnivore.user_friends',
@@ -25,4 +24,5 @@ export enum Table {
   REMINDER = 'omnivore.reminders',
   LABELS = 'omnivore.labels',
   LINK_LABELS = 'omnivore.link_labels',
+  SAVED_SEARCH = 'omnivore.saved_searches',
 }

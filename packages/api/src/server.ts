@@ -56,6 +56,7 @@ import {
   buildLoggerTransport,
   CustomTypeOrmLogger,
 } from './utils/logger'
+import SavedSearchModel from './datalayer/saved_search'
 
 const PORT = process.env.PORT || 4000
 
@@ -70,6 +71,7 @@ export const initModels = (kx: Knex, cache = true): DataModels => ({
   highlight: new HighlightModel(kx, cache),
   reaction: new ReactionModel(kx, cache),
   reminder: new ReminderModel(kx, cache),
+  savedSearch: new SavedSearchModel(kx, cache),
 })
 
 export const AppDataSource = new DataSource({

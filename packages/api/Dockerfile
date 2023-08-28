@@ -19,12 +19,14 @@ COPY /packages/content-handler/package.json ./packages/content-handler/package.j
 RUN yarn install --pure-lockfile
 
 ADD /packages/readabilityjs ./packages/readabilityjs
-ADD /packages/api ./packages/api
 ADD /packages/text-to-speech ./packages/text-to-speech
 ADD /packages/content-handler ./packages/content-handler
 
 RUN yarn workspace @omnivore/text-to-speech-handler build
 RUN yarn workspace @omnivore/content-handler build
+
+# Run after running content-handler and text-to-speech to cache the previous workspace builds!
+ADD /packages/api ./packages/api
 RUN yarn workspace @omnivore/api build
 
 # After building, fetch the production dependencies

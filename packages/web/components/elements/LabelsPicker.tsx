@@ -159,6 +159,7 @@ export const LabelsPicker = (props: LabelsPickerProps): JSX.Element => {
       }}
     >
       {isStacked ? (
+
         <EditLabelChipStack
           labels={selectedLabels}
           setExpanded={(expanded: boolean) => {
