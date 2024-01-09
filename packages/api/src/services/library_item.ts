@@ -108,7 +108,7 @@ const handleNoCase = (value: string) => {
   }
 
   const matchingKeyword = Object.keys(keywordRegexMap).find((keyword) =>
-    value.match(keywordRegexMap[keyword])
+    value.match(keywordRegexMap[keyword]),
   )
 
   if (matchingKeyword) {
@@ -124,7 +124,7 @@ const paramtersToObject = (parameters: ObjectLiteral[]) => {
 }
 
 export const sortParamsToSort = (
-  sortParams: InputMaybe<SortParams> | undefined
+  sortParams: InputMaybe<SortParams> | undefined,
 ) => {
   const sort = { by: SortBy.UPDATED, order: SortOrder.DESCENDING }
 
@@ -184,18 +184,18 @@ export const buildQuery = (
   parameters: ObjectLiteral[] = [],
   selects: Select[] = [],
   orders: Sort[] = [],
-  useFolders = false
+  useFolders = false,
 ) => {
   const escapeQueryWithParameters = (
     query: string,
-    parameter: ObjectLiteral
+    parameter: ObjectLiteral,
   ) => {
     parameters.push(parameter)
     return query
   }
 
   const serializeImplicitField = (
-    expression: ExpressionToken
+    expression: ExpressionToken,
   ): string | null => {
     if (expression.type !== 'LiteralExpression') {
       throw new Error('Expected a literal expression')
@@ -218,7 +218,7 @@ export const buildQuery = (
 
     return escapeQueryWithParameters(
       `websearch_to_tsquery('english', :${param}) @@ library_item.search_tsv`,
-      { [param]: value }
+      { [param]: value },
     )
   }
 
@@ -259,7 +259,7 @@ export const buildQuery = (
                 const param = `folder_${parameters.length}`
                 const folderSql = escapeQueryWithParameters(
                   `library_item.folder = :${param}`,
-                  { [param]: value }
+                  { [param]: value },
                 )
                 sql = `(${sql} AND ${folderSql})`
               }
@@ -288,7 +288,7 @@ export const buildQuery = (
             `LOWER(library_item.item_type) = :${param}`,
             {
               [param]: value.toLowerCase(),
-            }
+            },
           )
         }
         case 'label': {
@@ -304,7 +304,7 @@ export const buildQuery = (
                     `exists (select 1 from unnest(array_cat(library_item.label_names, library_item.highlight_labels)::text[]) as label where label ILIKE :${param})`,
                     {
                       [param]: label.replace(/\*/g, '%'),
-                    }
+                    },
                   )
                 }
 
@@ -312,7 +312,7 @@ export const buildQuery = (
                   `:${param} = ANY(lower(array_cat(library_item.label_names, library_item.highlight_labels)::text)::text[])`,
                   {
                     [param]: label,
-                  }
+                  },
                 )
               })
               .join(' OR ')
@@ -323,7 +323,7 @@ export const buildQuery = (
         case 'sort': {
           const [sort, sortOrder] = value.toLowerCase().split('-')
           const matchingSortBy = Object.values(SortBy).find(
-            (sortBy) => sortBy === sort
+            (sortBy) => sortBy === sort,
           )
           if (!matchingSortBy) {
             return null
@@ -389,7 +389,7 @@ export const buildQuery = (
             {
               [startParam]: startDate ?? new Date(0),
               [endParam]: endDate ?? new Date(),
-            }
+            },
           )
         }
         // term filters
@@ -403,7 +403,7 @@ export const buildQuery = (
             `library_item.${columnName} = :${param}`,
             {
               [param]: value,
-            }
+            },
           )
         }
         // match filters
@@ -421,7 +421,7 @@ export const buildQuery = (
             {
               [param]: value,
               [wildcardParam]: `%${value}%`,
-            }
+            },
           )
         }
         case 'includes': {
@@ -447,7 +447,7 @@ export const buildQuery = (
             `:${param} = ANY(lower(library_item.recommender_names::text)::text[])`,
             {
               [param]: value.toLowerCase(),
-            }
+            },
           )
         }
         case 'no':
@@ -475,7 +475,7 @@ export const buildQuery = (
             `library_item.${column} ${operator} :${param}`,
             {
               [param]: parseInt(newValue, 10),
-            }
+            },
           )
         }
         default:
@@ -549,7 +549,7 @@ export const buildQuery = (
 
 export const searchLibraryItems = async (
   args: SearchArgs,
-  userId: string
+  userId: string,
 ): Promise<{ libraryItems: LibraryItem[]; count: number }> => {
   const { from = 0, size = 10 } = args
 
@@ -559,7 +559,7 @@ export const searchLibraryItems = async (
     .filter(
       (select) =>
         select.column !== 'library_item.readableContent' &&
-        select.column !== 'library_item.originalContent'
+        select.column !== 'library_item.originalContent',
     )
 
   const parameters: ObjectLiteral[] = []
@@ -575,7 +575,7 @@ export const searchLibraryItems = async (
       parameters,
       selects,
       orders,
-      args.useFolders
+      args.useFolders,
     )
   }
 
@@ -626,13 +626,13 @@ export const searchLibraryItems = async (
       return { libraryItems, count }
     },
     undefined,
-    userId
+    userId,
   )
 }
 
 export const findLibraryItemById = async (
   id: string,
-  userId: string
+  userId: string,
 ): Promise<LibraryItem | null> => {
   return authTrx(
     async (tx) =>
@@ -644,13 +644,13 @@ export const findLibraryItemById = async (
         .where('library_item.id = :id', { id })
         .getOne(),
     undefined,
-    userId
+    userId,
   )
 }
 
 export const findLibraryItemByUrl = async (
   url: string,
-  userId: string
+  userId: string,
 ): Promise<LibraryItem | null> => {
   return authTrx(
     async (tx) =>
@@ -666,14 +666,14 @@ export const findLibraryItemByUrl = async (
         .andWhere('library_item.original_url = :url', { url })
         .getOne(),
     undefined,
-    userId
+    userId,
   )
 }
 
 export const restoreLibraryItem = async (
   id: string,
   userId: string,
-  pubsub = createPubSubClient()
+  pubsub = createPubSubClient(),
 ): Promise<LibraryItem> => {
   return updateLibraryItem(
     id,
@@ -684,7 +684,7 @@ export const restoreLibraryItem = async (
       deletedAt: null,
     },
     userId,
-    pubsub
+    pubsub,
   )
 }
 
@@ -692,7 +692,7 @@ export const updateLibraryItem = async (
   id: string,
   libraryItem: QueryDeepPartialEntity<LibraryItem>,
   userId: string,
-  pubsub = createPubSubClient()
+  pubsub = createPubSubClient(),
 ): Promise<LibraryItem> => {
   const updatedLibraryItem = await authTrx(
     async (tx) => {
@@ -717,7 +717,7 @@ export const updateLibraryItem = async (
       return itemRepo.findOneByOrFail({ id })
     },
     undefined,
-    userId
+    userId,
   )
 
   await pubsub.entityUpdated<QueryDeepPartialEntity<LibraryItem>>(
@@ -729,7 +729,7 @@ export const updateLibraryItem = async (
       originalContent: undefined,
       readableContent: undefined,
     },
-    userId
+    userId,
   )
 
   return updatedLibraryItem
@@ -740,7 +740,8 @@ export const updateLibraryItemReadingProgress = async (
   userId: string,
   bottomPercent: number,
   topPercent: number | null = null,
-  anchorIndex: number | null = null
+  anchorIndex: number | null = null,
+  pubsub = createPubSubClient(),
 ): Promise<LibraryItem | null> => {
   // If we have a top percent, we only save it if it's greater than the current top percent
   // or set to zero if the top percent is zero.
@@ -777,10 +778,10 @@ export const updateLibraryItemReadingProgress = async (
         reading_progress_highest_read_anchor as "readingProgressHighestReadAnchor",
         read_at as "readAt"
       `,
-        [id, topPercent, bottomPercent, anchorIndex]
+        [id, topPercent, bottomPercent, anchorIndex],
       ),
     undefined,
-    userId
+    userId,
   )) as [LibraryItem[], number]
   if (result[1] === 0) {
     return null
@@ -792,12 +793,12 @@ export const updateLibraryItemReadingProgress = async (
 
 export const createLibraryItems = async (
   libraryItems: DeepPartial<LibraryItem>[],
-  userId: string
+  userId: string,
 ): Promise<LibraryItem[]> => {
   return authTrx(
     async (tx) => tx.withRepository(libraryItemRepository).save(libraryItems),
     undefined,
-    userId
+    userId,
   )
 }
 
@@ -805,7 +806,7 @@ export const createLibraryItem = async (
   libraryItem: DeepPartial<LibraryItem>,
   userId: string,
   pubsub = createPubSubClient(),
-  skipPubSub = false
+  skipPubSub = false,
 ): Promise<LibraryItem> => {
   const newLibraryItem = await authTrx(
     async (tx) =>
@@ -816,7 +817,7 @@ export const createLibraryItem = async (
           wordsCount(libraryItem.readableContent || ''),
       }),
     undefined,
-    userId
+    userId,
   )
 
   // set recently saved item in redis if redis is enabled
@@ -836,7 +837,7 @@ export const createLibraryItem = async (
       originalContent: undefined,
       readableContent: undefined,
     },
-    userId
+    userId,
   )
 
   return newLibraryItem
@@ -845,7 +846,7 @@ export const createLibraryItem = async (
 export const findLibraryItemsByPrefix = async (
   prefix: string,
   userId: string,
-  limit = 5
+  limit = 5,
 ): Promise<LibraryItem[]> => {
   const prefixWildcard = `${prefix}%`
 
@@ -855,18 +856,18 @@ export const findLibraryItemsByPrefix = async (
       .where('library_item.user_id = :userId', { userId })
       .andWhere(
         '(library_item.title ILIKE :prefix OR library_item.site_name ILIKE :prefix)',
-        { prefix: prefixWildcard }
+        { prefix: prefixWildcard },
       )
       .orderBy('library_item.savedAt', 'DESC')
       .limit(limit)
-      .getMany()
+      .getMany(),
   )
 }
 
 export const countByCreatedAt = async (
   userId: string,
   startDate = new Date(0),
-  endDate = new Date()
+  endDate = new Date(),
 ): Promise<number> => {
   return authTrx(
     async (tx) =>
@@ -879,7 +880,7 @@ export const countByCreatedAt = async (
         })
         .getCount(),
     undefined,
-    userId
+    userId,
   )
 }
 
@@ -888,7 +889,7 @@ export const batchUpdateLibraryItems = async (
   searchArgs: SearchArgs,
   userId: string,
   labels?: Label[],
-  args?: unknown
+  args?: unknown,
 ) => {
   interface FolderArguments {
     folder: string
@@ -975,10 +976,10 @@ export const batchUpdateLibraryItems = async (
           }))
           .filter((entityLabel) => {
             const existingLabel = libraryItem.labelNames?.find(
-              (l) => l.toLowerCase() === entityLabel.name.toLowerCase()
+              (l) => l.toLowerCase() === entityLabel.name.toLowerCase(),
             )
             return !existingLabel
-          })
+          }),
       )
       return tx.getRepository(EntityLabel).save(labelsToAdd)
     }
@@ -1018,18 +1019,18 @@ export const deleteLibraryItemById = async (id: string, userId?: string) => {
   return authTrx(
     async (tx) => tx.withRepository(libraryItemRepository).delete(id),
     undefined,
-    userId
+    userId,
   )
 }
 
 export const deleteLibraryItems = async (
   items: LibraryItem[],
-  userId?: string
+  userId?: string,
 ) => {
   return authTrx(
     async (tx) => tx.withRepository(libraryItemRepository).remove(items),
     undefined,
-    userId
+    userId,
   )
 }
 
@@ -1040,7 +1041,7 @@ export const deleteLibraryItemByUrl = async (url: string, userId: string) => {
         .withRepository(libraryItemRepository)
         .delete({ originalUrl: url, user: { id: userId } }),
     undefined,
-    userId
+    userId,
   )
 }
 
@@ -1051,18 +1052,18 @@ export const deleteLibraryItemsByUserId = async (userId: string) => {
         user: { id: userId },
       }),
     undefined,
-    userId
+    userId,
   )
 }
 
 export const deleteLibraryItemsByAdmin = async (
-  criteria: FindOptionsWhere<LibraryItem>
+  criteria: FindOptionsWhere<LibraryItem>,
 ) => {
   return authTrx(
     async (tx) => tx.withRepository(libraryItemRepository).delete(criteria),
     undefined,
     undefined,
-    'admin'
+    'admin',
   )
 }
 

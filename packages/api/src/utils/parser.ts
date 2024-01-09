@@ -89,7 +89,7 @@ export const RSS_PARSER_CONFIG = {
 /** Hook that prevents DOMPurify from removing youtube iframes */
 const domPurifySanitizeHook = (
   node: Element,
-  data: SanitizeElementHookEvent
+  data: SanitizeElementHookEvent,
 ): void => {
   if (data.tagName === 'iframe') {
     const urlRegex = /^(https?:)?\/\/www\.youtube(-nocookie)?\.com\/embed\//i
@@ -181,7 +181,7 @@ const getReadabilityResult = async (
   url: string,
   html: string,
   document?: Document,
-  isNewsletter?: boolean
+  isNewsletter?: boolean,
 ): Promise<Readability.ParseResult | null> => {
   // First attempt to read the article as is.
   // if that fails attempt to purify then read
@@ -225,7 +225,7 @@ export const parsePreparedContent = async (
   preparedDocument: PreparedDocumentInput,
   parseResult?: Readability.ParseResult | null,
   isNewsletter?: boolean,
-  allowRetry = true
+  allowRetry = true,
 ): Promise<ParsedContentPuppeteer> => {
   const logRecord: ArticleParseLogRecord = {
     url: url,
@@ -285,7 +285,7 @@ export const parsePreparedContent = async (
         newDocument,
         parseResult,
         isNewsletter,
-        false
+        false,
       )
     }
 
@@ -295,7 +295,7 @@ export const parsePreparedContent = async (
     if (article?.content) {
       const articleDom = parseHTML(article.content).document
       const codeBlocks = articleDom.querySelectorAll(
-        'code, pre[class^="prism-"], pre[class^="language-"]'
+        'code, pre[class^="prism-"], pre[class^="language-"]',
       )
       if (codeBlocks.length > 0) {
         codeBlocks.forEach((e) => {
@@ -334,7 +334,7 @@ export const parsePreparedContent = async (
           currentNode?.nodeType !== 1 ||
           // Avoiding dynamic elements from being counted as anchor-allowed elements
           ANCHOR_ELEMENTS_BLOCKED_ATTRIBUTES.some((attrib) =>
-            currentNode.hasAttribute(attrib)
+            currentNode.hasAttribute(attrib),
           )
         ) {
           continue
@@ -407,12 +407,12 @@ export const parsePreparedContent = async (
  * @returns Parsed article partial result from the JSONLD link if found (possibly not)
  */
 const getJSONLdLinkMetadata = async (
-  document: Document
+  document: Document,
 ): Promise<Partial<Readability.ParseResult>> => {
   const result: Partial<Readability.ParseResult> = {}
   try {
     const jsonLdLink = document.querySelector<HTMLLinkElement>(
-      "link[type='application/json+oembed']"
+      "link[type='application/json+oembed']",
     )
     if (!jsonLdLink || !jsonLdLink.href) return result
 
@@ -474,7 +474,7 @@ export const parsePageMetadata = (html: string): Metadata | undefined => {
 }
 
 export const parseUrlMetadata = async (
-  url: string
+  url: string,
 ): Promise<Metadata | undefined> => {
   try {
     const res = await axios.get(url)
@@ -491,7 +491,7 @@ export const parseUrlMetadata = async (
 
 export const isProbablyArticle = async (
   email: string,
-  subject: string
+  subject: string,
 ): Promise<boolean> => {
   const user = await userRepository.findOneBy({
     email: ILike(email),
@@ -519,7 +519,7 @@ export const parseEmailAddress = (from: string): addressparser.EmailAddress => {
 }
 
 export const fetchFavicon = async (
-  url: string
+  url: string,
 ): Promise<string | undefined> => {
   // don't fetch favicon for fake urls
   if (url.startsWith(FAKE_URL_PREFIX)) return undefined
@@ -632,13 +632,13 @@ export const highlightTranslators: TranslatorConfigObject = {
 const nhm = new NodeHtmlMarkdown(
   /* options (optional) */ {},
   /* customTransformers (optional) */ highlightTranslators,
-  /* customCodeBlockTranslators (optional) */ undefined
+  /* customCodeBlockTranslators (optional) */ undefined,
 )
 
 type contentConverterFunc = (html: string, highlights?: Highlight[]) => string
 
 export const contentConverter = (
-  format: string
+  format: string,
 ): contentConverterFunc | undefined => {
   switch (format) {
     case ArticleFormat.Markdown:
@@ -653,7 +653,7 @@ export const contentConverter = (
 
 export const htmlToHighlightedMarkdown = (
   html: string,
-  highlights?: Highlight[]
+  highlights?: Highlight[],
 ): string => {
   if (!highlights || highlights.length == 0) {
     return nhm.translate(/* html */ html)
@@ -686,7 +686,7 @@ export const htmlToHighlightedMarkdown = (
         makeHighlightNodeAttributes(
           highlight.id,
           highlight.patch as string,
-          articleTextNodes
+          articleTextNodes,
         )
       } catch (err) {
         logger.info(err)
@@ -703,7 +703,7 @@ export const htmlToMarkdown = (html: string) => {
 
 export const getDistillerResult = async (
   uid: string,
-  html: string
+  html: string,
 ): Promise<string | undefined> => {
   try {
     const url = process.env.DISTILLER_URL
@@ -751,11 +751,14 @@ export const parseOpml = (opml: string): Feed[] | undefined => {
   xmlParser.onopentag = function (node) {
     if (node.name === 'outline') {
       // folders also are outlines, make sure an xmlUrl is available
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const feedUrl = node.attributes.xmlUrl.toString()
       if (feedUrl && !existingFeeds.has(feedUrl)) {
         feeds.push({
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           title: node.attributes.title.toString() || '',
           url: feedUrl,
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           type: node.attributes.type.toString() || 'rss',
         })
         existingFeeds.set(feedUrl, true)
@@ -800,7 +803,7 @@ export const parseHtml = async (url: string): Promise<Feed[] | undefined> => {
 
 export const parseFeed = async (
   url: string,
-  content?: string | null
+  content?: string | null,
 ): Promise<Feed | null> => {
   try {
     // check if url is a telegram channel

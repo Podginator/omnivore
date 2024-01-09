@@ -8,11 +8,11 @@ import type { SelectionAttributes } from './highlightHelpers'
 
 /**
  * Get the range of text with {@link SelectionAttributes} that user has selected
- * 
+ *
  * Event Handlers for detecting/using new highlight selection are registered
- * 
+ *
  * If the new highlight selection overlaps with existing highlights, the new selection is merged.
- * 
+ *
  * @param highlightLocations existing highlights
  * @returns selection range and its setter
  */
@@ -246,8 +246,8 @@ async function makeSelectionRange(): Promise<
 
   /**
    * Edge case:
-   * If the selection ends on range endContainer (or startContainer in reverse select) but no text is selected (i.e. selection ends at 
-   * an empty area), the preceding text is highlighted due to range normalizing. 
+   * If the selection ends on range endContainer (or startContainer in reverse select) but no text is selected (i.e. selection ends at
+   * an empty area), the preceding text is highlighted due to range normalizing.
    * This is a visual bug and would sometimes lead to weird highlight behavior during removal.
    */
   const selectionEndNode = selection.focusNode
@@ -257,21 +257,21 @@ async function makeSelectionRange(): Promise<
   if (selectionEndNode?.nodeType === Node.TEXT_NODE) {
     const selectionEndNodeEdgeIndex = isReverseSelected ? selectionEndNode.textContent?.length : 0
 
-    if (selectionStartNode !== selectionEndNode && 
+    if (selectionStartNode !== selectionEndNode &&
       selectionEndOffset == selectionEndNodeEdgeIndex) {
-        clipRangeToNearestAnchor(range, selectionEndNode, isReverseSelected) 
+        clipRangeToNearestAnchor(range, selectionEndNode, isReverseSelected)
     }
-  } 
-  
+  }
+
   return isRangeAllowed ? { range, isReverseSelected, selection } : undefined
 }
 
 /**
  * Clip selection range to the beginning/end of the adjacent anchor element
- * 
+ *
  * @param range selection range
  * @param selectionEndNode the node where the selection ended at
- * @param isReverseSelected 
+ * @param isReverseSelected
  */
 const clipRangeToNearestAnchor = (
   range: Range,
@@ -326,7 +326,7 @@ export type RangeEndPos = {
 
 /**
  * Return coordinates of the screen area occupied by the last line of user selection
- * 
+ *
  * @param range range of user selection
  * @param getFirst whether to get first line of user selection. Get last if false (default)
  * @returns {RangeEndPos} selection coordinates

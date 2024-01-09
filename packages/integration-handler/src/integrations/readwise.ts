@@ -76,7 +76,7 @@ export class ReadwiseClient extends IntegrationClient {
   syncWithReadwise = async (
     token: string,
     highlights: ReadwiseHighlight[],
-    retryCount = 0
+    retryCount = 0,
   ): Promise<boolean> => {
     const url = `${this.apiUrl}/highlights`
     try {
@@ -91,7 +91,7 @@ export class ReadwiseClient extends IntegrationClient {
             'Content-Type': 'application/json',
           },
           timeout: 5000, // 5 seconds
-        }
+        },
       )
       return response.status === 200
     } catch (error) {
@@ -102,7 +102,8 @@ export class ReadwiseClient extends IntegrationClient {
           console.log('Readwise API rate limit exceeded, retrying...')
           // wait for Retry-After seconds in the header if rate limited
           // max retry count is 3
-          const retryAfter = error.response?.headers['retry-after'] || '10' // default to 10 seconds
+          const retryAfter: string =
+            error.response?.headers['retry-after'] || '10' // default to 10 seconds
           await wait(parseInt(retryAfter, 10) * 1000)
           return this.syncWithReadwise(token, highlights, retryCount + 1)
         }

@@ -9,7 +9,7 @@ import { findUploadFileById, setFileUploadComplete } from './upload_file'
 
 export const saveFile = async (
   input: SaveFileInput,
-  user: User
+  user: User,
 ): Promise<SaveResult> => {
   const uploadFile = await findUploadFileById(input.uploadFileId)
   if (!uploadFile) {
@@ -35,7 +35,7 @@ export const saveFile = async (
         state: (input.state as unknown as LibraryItemState) || undefined,
         folder: input.folder || undefined,
       },
-      user.id
+      user.id,
     )
   }
 
@@ -43,7 +43,7 @@ export const saveFile = async (
   await createAndSaveLabelsInLibraryItem(
     input.clientRequestId,
     user.id,
-    input.labels
+    input.labels,
   )
 
   return {

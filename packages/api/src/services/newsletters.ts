@@ -23,7 +23,7 @@ export const createNewsletterEmail = async (
   confirmationCode?: string,
   folder?: string,
   name?: string,
-  description?: string
+  description?: string,
 ): Promise<NewsletterEmail> => {
   const user = await userRepository.findById(userId)
   if (!user) {
@@ -45,7 +45,7 @@ export const createNewsletterEmail = async (
 }
 
 export const getNewsletterEmails = async (
-  userId: string
+  userId: string,
 ): Promise<NewsletterEmail[]> => {
   return getRepository(NewsletterEmail)
     .createQueryBuilder('newsletter_email')
@@ -56,7 +56,7 @@ export const getNewsletterEmails = async (
       'subscriptions.status = :status',
       {
         status: SubscriptionStatus.Active,
-      }
+      },
     )
     .where('newsletter_email.user = :userId', { userId })
     .orderBy('newsletter_email.createdAt', 'DESC')
@@ -71,7 +71,7 @@ export const deleteNewsletterEmail = async (id: string): Promise<boolean> => {
 
 export const updateConfirmationCode = async (
   emailAddress: string,
-  confirmationCode: string
+  confirmationCode: string,
 ): Promise<boolean> => {
   const address = parsedAddress(emailAddress)
   const result = await getRepository(NewsletterEmail)
@@ -86,7 +86,7 @@ export const updateConfirmationCode = async (
 }
 
 export const findNewsletterEmailByAddress = async (
-  emailAddress: string
+  emailAddress: string,
 ): Promise<NewsletterEmail | null> => {
   const address = parsedAddress(emailAddress)
   return getRepository(NewsletterEmail)
@@ -111,7 +111,7 @@ const createRandomEmailAddress = (userName: string, length: number): string => {
 }
 
 export const findNewsletterEmailById = async (
-  id: string
+  id: string,
 ): Promise<NewsletterEmail | null> => {
   return getRepository(NewsletterEmail).findOneBy({ id })
 }
@@ -119,7 +119,7 @@ export const findNewsletterEmailById = async (
 export const updateNewsletterEmail = async (
   id: string,
   userId: string,
-  newsletterEmail: Partial<NewsletterEmail>
+  newsletterEmail: Partial<NewsletterEmail>,
 ): Promise<NewsletterEmail | null> => {
   const repo = getRepository(NewsletterEmail)
   const result = await repo

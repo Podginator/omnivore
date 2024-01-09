@@ -89,7 +89,7 @@ function parseDomTree(pageNode: Element) {
       currentNode?.nodeType !== 1 /* Node.ELEMENT_NODE */ ||
       // Avoiding dynamic elements from being counted as anchor-allowed elements
       ANCHOR_ELEMENTS_BLOCKED_ATTRIBUTES.some((attrib) =>
-        currentNode.hasAttribute(attrib)
+        currentNode.hasAttribute(attrib),
       )
     ) {
       continue
@@ -124,7 +124,7 @@ function cleanTextNode(textNode: ChildNode): string {
 function emitTextNode(
   textItems: string[],
   cleanedText: string,
-  textNode: ChildNode
+  textNode: ChildNode,
 ) {
   const ssmlElement =
     textNode.parentNode?.nodeName === 'B' ? 'emphasis' : undefined
@@ -144,7 +144,7 @@ function emitTextNode(
 function emitElement(
   textItems: string[],
   element: Element,
-  isTopLevel: boolean
+  isTopLevel: boolean,
 ) {
   const SKIP_TAGS = [
     'SCRIPT',
@@ -222,7 +222,7 @@ export const ssmlItemText = (item: SSMLItem): string => {
 
 export const htmlToSsmlItems = (
   html: string,
-  options: SSMLOptions
+  options: SSMLOptions,
 ): SSMLItem[] => {
   console.log('creating ssml with options', options)
 
@@ -288,7 +288,7 @@ const textToUtterances = ({
         idx,
         text,
         wordOffset,
-        wordCount: wordTokenizer.tokenize(text).length,
+        wordCount: wordTokenizer.tokenize(text)?.length ?? 0,
         voice,
       },
     ]
@@ -326,7 +326,7 @@ const textToUtterances = ({
     const nextText = currentText + sentence
     if (nextText.length > MAX_CHARS) {
       if (currentText.length > 0) {
-        const wordCount = wordTokenizer.tokenize(currentText).length
+        const wordCount = wordTokenizer.tokenize(currentText)?.length ?? 0
         utterances.push({
           idx,
           text: currentText,
@@ -337,7 +337,7 @@ const textToUtterances = ({
         wordOffset += wordCount
         currentText = sentence
       } else {
-        const wordCount = wordTokenizer.tokenize(sentence).length
+        const wordCount = wordTokenizer.tokenize(sentence)?.length ?? 0
         utterances.push({
           idx,
           text: sentence,
@@ -355,7 +355,7 @@ const textToUtterances = ({
         idx,
         text: currentText,
         wordOffset,
-        wordCount: wordTokenizer.tokenize(currentText).length,
+        wordCount: wordTokenizer.tokenize(currentText)?.length ?? 0,
         voice,
       })
     }

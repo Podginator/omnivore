@@ -102,7 +102,7 @@ export const setIntegrationResolver = authorized<
         integration.id,
         integration.name,
         0,
-        authToken
+        authToken,
       )
       log.info('enqueued task', taskName)
 
@@ -122,7 +122,7 @@ export const setIntegrationResolver = authorized<
         {
           taskName: null,
         },
-        uid
+        uid,
       )
       integration.taskName = null
     }
@@ -243,7 +243,7 @@ export const importFromIntegrationResolver = authorized<
       integration.name,
       integration.syncedAt?.getTime() || 0,
       authToken,
-      integration.importItemState || ImportItemState.Unarchived
+      integration.importItemState || ImportItemState.Unarchived,
     )
     // update task name in integration
     await updateIntegration(integration.id, { taskName }, uid)

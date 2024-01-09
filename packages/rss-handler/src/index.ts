@@ -108,8 +108,10 @@ const getThumbnail = (item: RssFeedItem) => {
     .url
 }
 
-function isRssFeedRequest(body: any): body is RssFeedRequest {
+function isRssFeedRequest(body: unknown): body is RssFeedRequest {
   return (
+    body != null &&
+    typeof body == 'object' &&
     'subscriptionIds' in body &&
     'feedUrl' in body &&
     'lastFetchedTimestamps' in body &&
@@ -194,7 +196,7 @@ const sendUpdateSubscriptionMutation = async (
   subscriptionId: string,
   lastFetchedAt: Date,
   lastFetchedChecksum: string,
-  scheduledAt: Date
+  scheduledAt: Date,
 ) => {
   const JWT_SECRET = process.env.JWT_SECRET
   const REST_BACKEND_ENDPOINT = process.env.REST_BACKEND_ENDPOINT
@@ -238,7 +240,7 @@ const sendUpdateSubscriptionMutation = async (
           'Content-Type': 'application/json',
         },
         timeout: 30000, // 30s
-      }
+      },
     )
 
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -256,7 +258,7 @@ const sendUpdateSubscriptionMutation = async (
 const isItemRecentlySaved = async (
   redisClient: RedisClient,
   userId: string,
-  url: string
+  url: string,
 ) => {
   const key = `recent-saved-item:${userId}:${url}`
   const result = await redisClient.get(key)
@@ -269,12 +271,12 @@ const createTask = async (
   item: RssFeedItem,
   fetchContent: boolean,
   folder: FolderType,
-  redisClient: RedisClient
+  redisClient: RedisClient,
 ) => {
   const isRecentlySaved = await isItemRecentlySaved(
     redisClient,
     userId,
-    item.link
+    item.link,
   )
   if (isRecentlySaved) {
     console.log('Item recently saved', item.link)
@@ -292,7 +294,7 @@ const fetchContentAndCreateItem = async (
   userId: string,
   feedUrl: string,
   item: RssFeedItem,
-  folder: string
+  folder: string,
 ) => {
   const input = {
     userId,
@@ -322,7 +324,7 @@ const fetchContentAndCreateItem = async (
 const createItemWithPreviewContent = async (
   userId: string,
   feedUrl: string,
-  item: RssFeedItem
+  item: RssFeedItem,
 ) => {
   const input = {
     userIds: [userId],
@@ -459,7 +461,7 @@ const processSubscription = async (
   fetchContent: boolean,
   folder: FolderType,
   feed: RssFeed,
-  redisClient: RedisClient
+  redisClient: RedisClient,
 ) => {
   let lastItemFetchedAt: Date | null = null
   let lastValidItem: RssFeedItem | null = null
@@ -536,7 +538,7 @@ const processSubscription = async (
       feedItem,
       fetchContent,
       folder,
-      redisClient
+      redisClient,
     )
     if (!created) {
       console.error('Failed to create task for feed item', feedItem.link)
@@ -566,7 +568,7 @@ const processSubscription = async (
       lastValidItem,
       fetchContent,
       folder,
-      redisClient
+      redisClient,
     )
     if (!created) {
       console.error('Failed to create task for feed item', lastValidItem.link)
@@ -588,7 +590,7 @@ const processSubscription = async (
     subscriptionId,
     lastItemFetchedAt,
     updatedLastFetchedChecksum,
-    new Date(nextScheduledAt)
+    new Date(nextScheduledAt),
   )
   console.log('Updated subscription', updatedSubscription)
 }
@@ -609,7 +611,7 @@ export const rssHandler = Sentry.GCPFunction.wrapHttpFunction(
       // create redis client
       const redisClient = await createRedisClient(
         process.env.REDIS_URL,
-        process.env.REDIS_CERT
+        process.env.REDIS_CERT,
       )
 
       const {
@@ -659,7 +661,7 @@ export const rssHandler = Sentry.GCPFunction.wrapHttpFunction(
           fetchContents[i] && allowFetchContent,
           folders[i],
           feed,
-          redisClient
+          redisClient,
         )
       }
 
@@ -668,5 +670,5 @@ export const rssHandler = Sentry.GCPFunction.wrapHttpFunction(
       console.error('Error while saving RSS feeds', e)
       res.status(500).send('INTERNAL_SERVER_ERROR')
     }
-  }
+  },
 )

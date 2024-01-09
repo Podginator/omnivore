@@ -152,7 +152,7 @@ export const createArticleResolver = authorized<
         publishedAt,
       },
     },
-    { log, uid, pubsub }
+    { log, uid, pubsub },
   ) => {
     analytics.track({
       userId: uid,
@@ -172,7 +172,7 @@ export const createArticleResolver = authorized<
         },
         uid,
         articleSavingRequestId,
-        pubsub
+        pubsub,
       )
     }
     const user = userDataToUser(userData)
@@ -185,7 +185,7 @@ export const createArticleResolver = authorized<
           },
           uid,
           articleSavingRequestId,
-          pubsub
+          pubsub,
         )
       }
 
@@ -197,7 +197,7 @@ export const createArticleResolver = authorized<
           .split('/')
           [pathname.split('/').length - 1].split('.')
           .slice(0, -1)
-          .join('.')
+          .join('.'),
       ).replace(/_/gi, ' ')
 
       let title: string | undefined
@@ -245,12 +245,12 @@ export const createArticleResolver = authorized<
             { errorCodes: [CreateArticleErrorCode.UploadFileMissing] },
             uid,
             articleSavingRequestId,
-            pubsub
+            pubsub,
           )
         }
         const uploadFileDetails = await getStorageFileDetails(
           uploadFileId,
-          uploadFile.fileName
+          uploadFile.fileName,
         )
         uploadFileHash = uploadFileDetails.md5Hash
         canonicalUrl = uploadFile.url
@@ -276,7 +276,7 @@ export const createArticleResolver = authorized<
           { spanName: 'article.parse' },
           async (): Promise<ParsedContentPuppeteer> => {
             return parsePreparedContent(url, preparedDocument)
-          }
+          },
         )
         parsedContent = parseResults.parsedContent
         canonicalUrl = parseResults.canonicalUrl
@@ -335,7 +335,7 @@ export const createArticleResolver = authorized<
             },
             uid,
             articleSavingRequestId,
-            pubsub
+            pubsub,
           )
         }
       }
@@ -344,7 +344,7 @@ export const createArticleResolver = authorized<
 
       const existingLibraryItem = await findLibraryItemByUrl(
         libraryItemToSave.originalUrl,
-        uid
+        uid,
       )
       articleSavingRequestId = existingLibraryItem?.id || articleSavingRequestId
       if (articleSavingRequestId) {
@@ -353,14 +353,14 @@ export const createArticleResolver = authorized<
           articleSavingRequestId,
           libraryItemToSave as QueryDeepPartialEntity<LibraryItem>,
           uid,
-          pubsub
+          pubsub,
         )
       } else {
         // create new item in database
         libraryItemToReturn = await createLibraryItem(
           libraryItemToSave,
           uid,
-          pubsub
+          pubsub,
         )
       }
 
@@ -368,7 +368,7 @@ export const createArticleResolver = authorized<
         libraryItemToReturn.id,
         uid,
         inputLabels,
-        rssFeedUrl
+        rssFeedUrl,
       )
 
       log.info(
@@ -376,7 +376,7 @@ export const createArticleResolver = authorized<
         libraryItemToReturn.id,
         libraryItemToReturn.originalUrl,
         libraryItemToReturn.slug,
-        libraryItemToReturn.title
+        libraryItemToReturn.title,
       )
 
       return {
@@ -392,10 +392,10 @@ export const createArticleResolver = authorized<
         },
         uid,
         articleSavingRequestId,
-        pubsub
+        pubsub,
       )
     }
-  }
+  },
 )
 
 export const getArticleResolver = authorized<
@@ -407,6 +407,7 @@ export const getArticleResolver = authorized<
     const selectColumns = getColumns(libraryItemRepository)
     const includeOriginalHtml =
       format === ArticleFormat.Distiller ||
+      // @ts-expect-error (Not sure why this has changed?)
       !!graphqlFields(info).article.originalHtml
     if (!includeOriginalHtml) {
       selectColumns.splice(selectColumns.indexOf('originalContent'), 1)
@@ -434,7 +435,7 @@ export const getArticleResolver = authorized<
             group: true,
           },
         },
-      })
+      }),
     )
 
     if (!libraryItem) {
@@ -453,7 +454,7 @@ export const getArticleResolver = authorized<
       }
       const distillerResult = await getDistillerResult(
         uid,
-        libraryItem.originalContent
+        libraryItem.originalContent,
       )
       if (!distillerResult) {
         return { errorCodes: [ArticleErrorCode.BadData] }
@@ -567,7 +568,7 @@ export const setBookmarkArticleResolver = authorized<
       deletedAt: new Date(),
     },
     uid,
-    pubsub
+    pubsub,
   )
 
   analytics.track({
@@ -607,7 +608,7 @@ export const saveArticleReadingProgressResolver = authorized<
         force,
       },
     },
-    { log, pubsub, uid }
+    { log, pubsub, uid },
   ) => {
     if (
       readingProgressPercent < 0 ||
@@ -632,7 +633,7 @@ export const saveArticleReadingProgressResolver = authorized<
             readAt: new Date(),
           },
           uid,
-          pubsub
+          pubsub,
         )
 
         return {
@@ -646,7 +647,7 @@ export const saveArticleReadingProgressResolver = authorized<
         uid,
         readingProgressPercent,
         readingProgressTopPercent,
-        readingProgressAnchorIndex
+        readingProgressAnchorIndex,
       )
       if (!updatedItem) {
         return { errorCodes: [SaveArticleReadingProgressErrorCode.BadData] }
@@ -660,7 +661,7 @@ export const saveArticleReadingProgressResolver = authorized<
 
       return { errorCodes: [SaveArticleReadingProgressErrorCode.Unauthorized] }
     }
-  }
+  },
 )
 
 export const searchResolver = authorized<
@@ -686,7 +687,7 @@ export const searchResolver = authorized<
       query: params.query,
       useFolders: params.query?.includes('use:folders'),
     },
-    uid
+    uid,
   )
 
   const start =
@@ -707,7 +708,7 @@ export const searchResolver = authorized<
       ) {
         libraryItem.highlights = await findHighlightsByLibraryItemId(
           libraryItem.id,
-          uid
+          uid,
         )
       }
 
@@ -719,7 +720,7 @@ export const searchResolver = authorized<
           if (converter) {
             libraryItem.readableContent = converter(
               libraryItem.readableContent,
-              libraryItem.highlights
+              libraryItem.highlights,
             )
           }
         } catch (error) {
@@ -731,7 +732,7 @@ export const searchResolver = authorized<
         node: libraryItemToSearchItem(libraryItem),
         cursor: endCursor,
       }
-    })
+    }),
   )
 
   return {
@@ -792,7 +793,7 @@ export const updatesSinceResolver = authorized<
       includeDeleted: true,
       query,
     },
-    uid
+    uid,
   )
 
   const start =
@@ -836,7 +837,7 @@ export const bulkActionResolver = authorized<
   async (
     _parent,
     { query, action, labelIds, arguments: args }, // arguments is a reserved keyword in JS
-    { uid, log }
+    { uid, log },
   ) => {
     try {
       analytics.track({
@@ -875,7 +876,7 @@ export const bulkActionResolver = authorized<
         },
         uid,
         labels,
-        args
+        args,
       )
 
       return { success: true }
@@ -883,7 +884,7 @@ export const bulkActionResolver = authorized<
       log.error('bulkActionResolver error', error)
       return { errorCodes: [BulkActionErrorCode.BadRequest] }
     }
-  }
+  },
 )
 
 export const setFavoriteArticleResolver = authorized<
@@ -939,7 +940,7 @@ export const moveToFolderResolver = authorized<
         id,
       },
       relations: ['user'],
-    })
+    }),
   )
 
   if (!item) {
@@ -963,7 +964,7 @@ export const moveToFolderResolver = authorized<
       savedAt,
     },
     uid,
-    pubsub
+    pubsub,
   )
 
   // if the content is not fetched yet, create a page save request
