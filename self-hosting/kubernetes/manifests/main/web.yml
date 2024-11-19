@@ -1,0 +1,67 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omnivore-web
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - omnivore.example.com
+      secretName: omnivore-example-ingress-tls
+  rules:
+    - host: omnivore.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: omnivore-web
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnivore-web
+  labels:
+    app: omnivore
+    component: web
+spec:
+  selector:
+    app: omnivore
+    component: web
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-web
+  labels:
+    app: omnivore
+    component: web
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: web
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: web
+    spec:
+      containers:
+        - name: web
+          image: docker.io/yourusername/omnivore-web
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: omnivore
+            - secretRef:
+                name: omnivore

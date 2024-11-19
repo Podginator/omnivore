@@ -1,0 +1,118 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omnivore-api
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - api.omnivore.example.com
+      secretName: api-omnivore-example-ingress-tls
+  rules:
+    - host: api.omnivore.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: omnivore-api
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnivore-api
+  labels:
+    app: omnivore
+    component: api
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: omnivore
+    component: api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-api
+  labels:
+    app: omnivore
+    component: api
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: api
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: api
+    spec:
+      initContainers:
+        - name: migrate
+          image: docker.io/yourusername/omnivore-migrate
+          envFrom:
+            - secretRef:
+                name: omnivore-postgres
+            - secretRef:
+                name: omnivore-postgres-admin
+          env:
+            - name: REPLICATION_SLOT_NAME
+              value: "replication_slot"
+            - name: DB_ROLE
+              value: "omnivore_user"
+        - name: createbuckets
+          image: minio/mc
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - |
+              /usr/bin/mc config host add myminio $ENDPOINT "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY";
+              /usr/bin/mc mb myminio/$BUCKET_NAME;
+              /usr/bin/mc anonymous set public myminio/$BUCKET_NAME;
+              exit 0;
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: omnivore
+                  key: AWS_ACCESS_KEY_ID
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: omnivore
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: omnivore
+                  key: GCS_UPLOAD_BUCKET
+            - name: ENDPOINT
+              value: "http://omnivore-minio.default.svc.cluster.local:9000"
+            - name: AWS_S3_ENDPOINT_URL
+              value: "http://omnivore-minio.default.svc.cluster.local:9000"
+      containers:
+        - name: api
+          image: docker.io/yourusername/omnivore-api
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            exec:
+              command: ["nc", "-z", "localhost", "8080"]
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 90
+          envFrom:
+            - secretRef:
+                name: omnivore-postgres
+            - secretRef:
+                name: omnivore
+            - configMapRef:
+                name: omnivore
