@@ -17,4 +17,4 @@ RUN yarn install
 ADD /packages/db ./packages/db
 ADD /packages/db/setup.sh ./packages/db/setup.sh
 
-CMD ["yarn", "workspace", "@omnivore/db", "migrate"]
+CMD ["/bin/sh", "./packages/db/setup.sh"]

@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnivore-content-fetch
+  labels:
+    app: omnivore
+    component: content-fetch
+spec:
+  selector:
+    app: omnivore
+    component: content-fetch
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-content-fetch
+  labels:
+    app: omnivore
+    component: content-fetch
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: content-fetch
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: content-fetch
+    spec:
+      containers:
+        - name: content-fetch
+          image: docker.io/yourusername/omnivore-content-fetch
+          ports:
+            - containerPort: 8080
+          env:
+            - name: USE_FIREFOX
+              value: "true"
+          envFrom:
+            - configMapRef:
+                name: omnivore
+            - secretRef:
+                name: omnivore

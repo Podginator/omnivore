@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: omnivore-minio
+  labels:
+    app: omnivore
+    component: minio
+spec:
+  storageClassName: nfs-storage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnivore-minio
+  labels:
+    app: omnivore
+    component: minio
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: omnivore
+    component: minio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-minio
+  labels:
+    app: omnivore
+    component: minio
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio
+          args:
+            - server
+            - /data
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: omnivore-minio
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: omnivore-minio
+                  key: MINIO_ROOT_PASSWORD
+            - name: AWS_S3_ENDPOINT_URL
+              value: "http://minio:9000"
+          ports:
+            - containerPort: 9000
+          livenessProbe:
+            exec:
+              command:
+                - mc
+                - ready
+                - local
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: storage
+              mountPath: "/data"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: omnivore-minio

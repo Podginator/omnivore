@@ -1,0 +1,67 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omnivore-imageproxy
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - imageproxy.omnivore.example.com
+      secretName: imageproxy-omnivore-example-ingress-tls
+  rules:
+    - host: imageproxy.omnivore.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: omnivore-imageproxy
+                port:
+                  number: 7070
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnivore-image-proxy
+  labels:
+    app: omnivore
+    component: image-proxy
+spec:
+  selector:
+    app: omnivore
+    component: image-proxy
+  ports:
+    - protocol: TCP
+      port: 7070
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-image-proxy
+  labels:
+    app: omnivore
+    component: image-proxy
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: image-proxy
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: image-proxy
+    spec:
+      containers:
+        - name: image-proxy
+          image: docker.io/yourusername/omnivore-image-proxy
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: omnivore
+            - secretRef:
+                name: omnivore

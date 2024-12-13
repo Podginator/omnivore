@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnivore-queue-processor
+  labels:
+    app: omnivore
+    component: queue-processor
+spec:
+  selector:
+    matchLabels:
+      app: omnivore
+      component: queue-processor
+  template:
+    metadata:
+      labels:
+        app: omnivore
+        component: queue-processor
+    spec:
+      containers:
+        - name: queue-processor
+          image: docker.io/yourusername/omnivore-queue-processor
+          envFrom:
+            - configMapRef:
+                name: omnivore
+            - secretRef:
+                name: omnivore
+            - secretRef:
+                name: omnivore-postgres
